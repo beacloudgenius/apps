@@ -1,0 +1,91 @@
+version: '3'
+
+services:
+  bitwarden:
+    container_name: vault
+    hostname: vault
+    image: vaultwarden/server:1.29.2
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $PWD/log:/var/log/vaultwarden
+      - $PWD/data:/data
+      # - type: volume
+      #   source: truenas
+      #   target: /data
+      #   volume:
+      #     nocopy: true
+    networks:
+      - traefik
+    environment:
+       # Admin Panel
+       # generate: openssl rand -base64 48
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      RUST_BACKTRACE: 1
+      LOG_FILE: /var/log/vaultwarden/vaultwarden.log
+      # nginx-ingress-controller has built in support for Websockets
+      # Project: https://github.com/kubernetes/ingress-nginx
+      # https://github.com/dani-garcia/vaultwarden/wiki/Proxy-examples
+      WEBSOCKET_ENABLED: true  # Enable WebSocket notifications.
+      WEBSOCKET_PORT: 3012
+      # Enable Vault interface, when disabled, only API is served
+      WEB_VAULT_ENABLED: true
+      # Where to store persistent data
+      # make sure that this reflects the setting in StatefulSet, otherwise data might be lost
+      # Number of workers to spin up for the service
+      ROCKET_WORKERS: "10"
+      # Port to serve http requests on
+      # most likely no need to change this here, look at ingress configuration instead
+      ROCKET_PORT: 80
+      DATA_FOLDER: "/data"
+      # What domain is bitwarden going to be hosted on
+      # This needs to reflect setting in ingress otherwise some 2FA methods might not work
+      DOMAIN: ${DOMAIN}
+      DOMAIN_ORIGIN: ${DOMAIN}
+      # https://github.com/dani-garcia/bitwarden_rs/blob/master/README.md#smtp-configuration
+      SMTP_HOST: "smtphost"
+      SMTP_FROM: "nilesh@cloudgeni.us"
+      SMTP_PORT: "2525"
+      SMTP_SECURITY: "starttls"
+      SMTP_USERNAME: 123123
+      SMTP_PASSWORD: 123123
+      # Allow current users invite new users even if registrations are otherwise disabled.
+      # https://github.com/dani-garcia/bitwarden_rs/blob/master/README.md#disable-invitations
+      INVITATIONS_ALLOWED: false
+      # Allow registration of new users
+      # disable after you set up your user(s)
+      SIGNUPS_ALLOWED: true
+      # see joplin for details on yubikey
+      # Show password hint instead of sending it via email
+      SHOW_PASSWORD_HINT: false
+      YUBICO_CLIENT_ID: "123123"
+      YUBICO_SECRET_KEY: "123123"
+
+    labels:
+      # Watchtower
+      com.centurylinklabs.watchtower.enable: true
+      # Traefik
+      traefik.enable: true
+      # Web-UI
+      traefik.http.routers.bitwarden.entrypoints: websecure
+      traefik.http.routers.bitwarden.rule: Host(`vault.internal.cloudgenius.app`)
+      traefik.http.routers.bitwarden.service: bitwarden-service
+      traefik.http.services.bitwarden-service.loadbalancer.server.port: 80
+      traefik.http.routers.bitwarden.tls: true
+      # Websocket
+      traefik.http.routers.bitwarden-ws.entrypoints: websecure
+      traefik.http.routers.bitwarden-ws.rule: Host(`vault.internal.cloudgenius.app`) && Path(`/notifications/hub`)
+      traefik.http.routers.bitwarden-ws.service: bitwarden-ws-service
+      traefik.http.services.bitwarden-ws-service.loadbalancer.server.port: 3012
+      traefik.http.routers.bitwarden-ws.tls: true
+
+networks:
+  traefik:
+    external: true
+
+# volumes:
+#   truenas:
+#     driver_opts:
+#       type: "nfs"
+#       o: "addr=truenas.cg.home.arpa,nolock,rw,soft,nointr,nfsvers=4"
+#       device: ":/mnt/tank/nfs/bw-data"

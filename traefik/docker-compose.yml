@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    image: traefik:v3.0
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+      # entrypoint ssh
+      - "222:222/tcp"
+    environment:
+      TZ: America/Los_Angeles
+      CF_API_EMAIL: nilesh@cloudgeni.us
+      # CF_DNS_API_TOKEN=YOU_API_TOKEN
+      CF_API_KEY: ${CF_API_KEY}
+    volumes:
+      - ./traefik-acme:/acme
+      - ./config/traefik.yml:/traefik.yml
+      - ./config/dynamic:/dynamic
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik
+    labels:
+      # Watchtower
+      com.centurylinklabs.watchtower.enable: true
+      # Traefik
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints: websecure
+      traefik.http.routers.traefik.rule: Host(`traefik.internal.cloudgenius.app`)
+      traefik.http.routers.traefik.tls: true
+      traefik.http.routers.traefik.tls.certresolver: cloudflare
+      traefik.http.routers.traefik.service: api@internal
+      # auth
+      # traefik.http.middlewares.traefik-auth.basicauth.users: "cloudgenius:$2y$05$suNrRm4fx/afsVRl8Dz6q.RE71np9ejNL5XEofHFwIVgYD1Q3J2wu"
+      traefik.http.routers.traefik.middlewares: simpleAuth@file
+
+      traefik.http.routers.traefik.tls.domains[0].main: "internal.cloudgenius.app"
+      traefik.http.routers.traefik.tls.domains[0].sans: "*.internal.cloudgenius.app"
+
+networks:
+  traefik:
+    name: traefik

@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $PWD/data:/data
+      # - type: volume
+      #   source: truenas
+      #   target: /data
+      #   volume:
+      #     nocopy: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.internal.cloudgenius.app`)"
+      - "traefik.http.middlewares.portainer-https-redirect.redirectscheme.scheme=websecure"
+      - "traefik.http.routers.portainer.middlewares=portainer-https-redirect"
+      - "traefik.http.routers.portainer-secure.entrypoints=websecure"
+      - "traefik.http.routers.portainer-secure.rule=Host(`portainer.internal.cloudgenius.app`)"
+      - "traefik.http.routers.portainer-secure.tls=true"
+      - "traefik.http.routers.portainer-secure.service=portainer"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.docker.network=traefik"
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  truenas:
+    driver_opts:
+      type: "nfs"
+      o: "addr=truenas.cg.home.arpa,nolock,rw,soft,nointr,nfsvers=4"
+      device: ":/mnt/tank/nfs/portainer-data"

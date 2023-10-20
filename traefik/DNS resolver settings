@@ -1,0 +1,37 @@
+DNS resolver settings
+
+
+server:
+local-zone: "internal.cloudgenius.app" redirect
+local-data: "internal.cloudgenius.app 86400 IN A 192.168.1.11"
+
+
+
+internal.cloudgenius.app is an alias of your home
+*.internal.cloudgenius.app is an alias of your home
+
+internal.cloudgenius.app
+
+
+# restart DNS resolver on the router
+
+# mac
+
+sudo killall -HUP mDNSResponder
+sudo dscacheutil -flushcache
+
+# linux
+
+sudo apt install dnsutils -y
+
+sudo systemctl restart systemd-resolved
+sudo service systemd-resolved status
+sudo resolvectl status
+sudo resolvectl flush-caches
+sudo resolvectl statistics | grep -i cache
+
+
+https://www.slideshare.net/NetgateUSA/local-dns-with-pfsense-24-pfsense-hangout-april-2018
+
+https://youtu.be/-CISZn804WI?si=bhgJ4WG5D3L6ptxt
+https://youtu.be/c-bDpZoG--w?si=2gKrbajdMorK8e_e

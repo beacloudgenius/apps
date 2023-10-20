@@ -1,0 +1,16 @@
+http:
+  middlewares:
+    secHeaders:
+      headers:                    # set some security headers
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        # sslRedirect: true
+        #HSTS Configuration
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 315360000
+        customFrameOptionsValue: "SAMEORIGIN"
+        customResponseHeaders:    # remove unnessesary headers which expose used server software
+          server: ""
+          x-powered-by: ""
