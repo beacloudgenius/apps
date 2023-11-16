@@ -16,8 +16,8 @@ services:
     environment:
       TZ: America/Los_Angeles
       CF_API_EMAIL: nilesh@cloudgeni.us
-      # CF_DNS_API_TOKEN=YOU_API_TOKEN
-      CF_API_KEY: ${CF_API_KEY}
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      # CF_API_KEY: ${CF_API_KEY}
     volumes:
       - ./traefik-acme:/acme
       - ./config/traefik.yml:/traefik.yml
@@ -36,7 +36,7 @@ services:
       traefik.http.routers.traefik.tls: true
       traefik.http.routers.traefik.tls.certresolver: cloudflare
       traefik.http.routers.traefik.service: api@internal
-      # auth
+      # auth - use the simple auth dynamic middleware or use this one liner
       # traefik.http.middlewares.traefik-auth.basicauth.users: "cloudgenius:$2y$05$suNrRm4fx/afsVRl8Dz6q.RE71np9ejNL5XEofHFwIVgYD1Q3J2wu"
       traefik.http.routers.traefik.middlewares: simpleAuth@file
 
