@@ -2,15 +2,15 @@ DNS resolver settings
 
 
 server:
-local-zone: "internal.cloudgenius.app" redirect
-local-data: "internal.cloudgenius.app 86400 IN A 192.168.1.11"
+local-zone: "i.cloudgenius.app" redirect
+local-data: "i.cloudgenius.app 86400 IN A 192.168.1.11"
 
 
 
-internal.cloudgenius.app is an alias of your home
-*.internal.cloudgenius.app is an alias of your home
+i.cloudgenius.app is an alias of your home
+*.i.cloudgenius.app is an alias of your home
 
-internal.cloudgenius.app
+i.cloudgenius.app
 
 
 # restart DNS resolver on the router

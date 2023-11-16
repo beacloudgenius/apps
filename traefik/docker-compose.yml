@@ -32,7 +32,7 @@ services:
       # Traefik
       traefik.enable: true
       traefik.http.routers.traefik.entrypoints: websecure
-      traefik.http.routers.traefik.rule: Host(`traefik.internal.cloudgenius.app`)
+      traefik.http.routers.traefik.rule: Host(`traefik.i.cloudgenius.app`)
       traefik.http.routers.traefik.tls: true
       traefik.http.routers.traefik.tls.certresolver: cloudflare
       traefik.http.routers.traefik.service: api@internal
@@ -40,8 +40,8 @@ services:
       # traefik.http.middlewares.traefik-auth.basicauth.users: "cloudgenius:$2y$05$suNrRm4fx/afsVRl8Dz6q.RE71np9ejNL5XEofHFwIVgYD1Q3J2wu"
       traefik.http.routers.traefik.middlewares: simpleAuth@file
 
-      traefik.http.routers.traefik.tls.domains[0].main: "internal.cloudgenius.app"
-      traefik.http.routers.traefik.tls.domains[0].sans: "*.internal.cloudgenius.app"
+      traefik.http.routers.traefik.tls.domains[0].main: "i.cloudgenius.app"
+      traefik.http.routers.traefik.tls.domains[0].sans: "*.i.cloudgenius.app"
 
 networks:
   traefik:

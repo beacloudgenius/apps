@@ -68,13 +68,13 @@ services:
       traefik.enable: true
       # Web-UI
       traefik.http.routers.bitwarden.entrypoints: websecure
-      traefik.http.routers.bitwarden.rule: Host(`vault.internal.cloudgenius.app`)
+      traefik.http.routers.bitwarden.rule: Host(`vault.i.cloudgenius.app`)
       traefik.http.routers.bitwarden.service: bitwarden-service
       traefik.http.services.bitwarden-service.loadbalancer.server.port: 80
       traefik.http.routers.bitwarden.tls: true
       # Websocket
       traefik.http.routers.bitwarden-ws.entrypoints: websecure
-      traefik.http.routers.bitwarden-ws.rule: Host(`vault.internal.cloudgenius.app`) && Path(`/notifications/hub`)
+      traefik.http.routers.bitwarden-ws.rule: Host(`vault.i.cloudgenius.app`) && Path(`/notifications/hub`)
       traefik.http.routers.bitwarden-ws.service: bitwarden-ws-service
       traefik.http.services.bitwarden-ws-service.loadbalancer.server.port: 3012
       traefik.http.routers.bitwarden-ws.tls: true
